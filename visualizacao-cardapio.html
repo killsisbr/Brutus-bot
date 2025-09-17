@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização do Cardápio - Brutus Burger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .cardapio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .item-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .item-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .item-info {
+            padding: 15px 20px;
+        }
+
+        .item-id {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .item-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .gatilhos-section {
+            margin-top: 15px;
+        }
+
+        .gatilhos-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gatilhos-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .gatilho-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gatilho-remove {
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-gatilho {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .add-gatilho input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .item-actions {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        .whatsapp-btn:hover {
+            background: #128c7e;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .cardapio-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍔 Brutus Burger</h1>
+            <p>Visualização e Gerenciamento do Cardápio</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar itens do cardápio...">
+            </div>
+            <button class="btn btn-primary" onclick="carregarCardapio()">🔄 Atualizar</button>
+            <button class="btn btn-success" onclick="adicionarNovoItem()">➕ Novo Item</button>
+        </div>
+
+        <div id="cardapioContainer" class="cardapio-grid">
+            <div class="loading">
+                <h3>⏳ Carregando cardápio...</h3>
+                <p>Aguarde enquanto buscamos os itens</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cardapioData = [];
+        let filteredData = [];
+
+        // Carregar cardápio ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarCardapio();
+            
+            // Configurar busca em tempo real
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                filtrarCardapio(e.target.value);
+            });
+        });
+
+        async function carregarCardapio() {
+            try {
+                const response = await fetch('/api/cardapio');
+                if (!response.ok) throw new Error('Erro ao carregar cardápio');
+                
+                cardapioData = await response.json();
+                filteredData = [...cardapioData];
+                renderizarCardapio();
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('cardapioContainer').innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Erro ao carregar cardápio</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="carregarCardapio()">Tentar novamente</button>
+                    </div>
+                `;
+            }
+        }
+
+        function filtrarCardapio(termo) {
+            if (!termo.trim()) {
+                filteredData = [...cardapioData];
+            } else {
+                const termoLower = termo.toLowerCase();
+                filteredData = cardapioData.filter(item => 
+                    item.nome.toLowerCase().includes(termoLower) ||
+                    item.descricao?.toLowerCase().includes(termoLower) ||
+                    item.categoria?.toLowerCase().includes(termoLower) ||
+                    (item.gatilhos && item.gatilhos.some(g => g.toLowerCase().includes(termoLower)))
+                );
+            }
+            renderizarCardapio();
+        }
+
+        function renderizarCardapio() {
+            const container = document.getElementById('cardapioContainer');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>🔍 Nenhum item encontrado</h3>
+                        <p>Tente ajustar os termos de busca</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredData.map(item => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-name">${item.nome}</div>
+                        <div class="item-price">R$ ${item.preco.toFixed(2)}</div>
+                    </div>
+                    
+                    <div class="item-info">
+                        <div class="item-id">ID: ${item.id} | Categoria: ${item.categoria || 'Não definida'}</div>
+                        ${item.descricao ? `<div class="item-description">${item.descricao}</div>` : ''}
+                        
+                        <div class="gatilhos-section">
+                            <div class="gatilhos-title">
+                                🎯 Gatilhos (${(item.gatilhos || []).length})
+                                <button class="btn btn-success btn-small" onclick="mostrarAdicionarGatilho(${item.id})">
+                                    ➕ Adicionar
+                                </button>
+                            </div>
+                            
+                            <div class="gatilhos-list">
+                                ${(item.gatilhos || []).map(gatilho => `
+                                    <span class="gatilho-tag">
+                                        ${gatilho}
+                                        <button class="gatilho-remove" onclick="removerGatilho(${item.id}, '${gatilho}')" title="Remover gatilho">
+                                            ×
+                                        </button>
+                                    </span>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="add-gatilho" id="addGatilho${item.id}" style="display: none;">
+                                <input type="text" placeholder="Digite o novo gatilho..." id="novoGatilho${item.id}">
+                                <button class="btn btn-success btn-small" onclick="adicionarGatilho(${item.id})">
+                                    ✓ Adicionar
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="cancelarAdicionarGatilho(${item.id})">
+                                    ✗ Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="item-actions">
+                        <button class="whatsapp-btn" onclick="testarWhatsApp(${item.id})">
+                            📱 Testar WhatsApp
+                        </button>
+                        <button class="btn btn-primary btn-small" onclick="editarItem(${item.id})">
+                            ✏️ Editar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function mostrarAdicionarGatilho(itemId) {
+            const addGatilhoDiv = document.getElementById(`addGatilho${itemId}`);
+            addGatilhoDiv.style.display = 'flex';
+            document.getElementById(`novoGatilho${itemId}`).focus();
+        }
+
+        function cancelarAdicionarGatilho(itemId) {
+            const addGatilhoDiv = document.getElementById(`addGatilho${itemId}`);
+            addGatilhoDiv.style.display = 'none';
+            document.getElementById(`novoGatilho${itemId}`).value = '';
+        }
+
+        async function adicionarGatilho(itemId) {
+            const input = document.getElementById(`novoGatilho${itemId}`);
+            const novoGatilho = input.value.trim();
+            
+            if (!novoGatilho) {
+                alert('Digite um gatilho válido!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/gatilhos/adicionar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        itemId: itemId,
+                        gatilho: novoGatilho
+                    })
+                });
+
+                if (!response.ok) throw new Error('Erro ao adicionar gatilho');
+                
+                const result = await response.json();
+                alert(`✅ Gatilho "${novoGatilho}" adicionado com sucesso!`);
+                
+                cancelarAdicionarGatilho(itemId);
+                carregarCardapio(); // Recarregar para mostrar o novo gatilho
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(`❌ Erro ao adicionar gatilho: ${error.message}`);
+            }
+        }
+
+        async function removerGatilho(itemId, gatilho) {
+            if (!confirm(`Tem certeza que deseja remover o gatilho "${gatilho}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/gatilhos/remover', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        itemId: itemId,
+                        gatilho: gatilho
+                    })
+                });
+
+                if (!response.ok) throw new Error('Erro ao remover gatilho');
+                
+                alert(`✅ Gatilho "${gatilho}" removido com sucesso!`);
+                carregarCardapio(); // Recarregar para atualizar a visualização
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(`❌ Erro ao remover gatilho: ${error.message}`);
+            }
+        }
+
+        async function testarWhatsApp(itemId) {
+            try {
+                const response = await fetch('/api/whatsapp/testar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        itemId: itemId
+                    })
+                });
+
+                if (!response.ok) throw new Error('Erro ao testar WhatsApp');
+                
+                const result = await response.json();
+                alert(`📱 Teste WhatsApp realizado!\n\nItem: ${result.item}\nStatus: ${result.status}\nMensagem: ${result.mensagem}`);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(`❌ Erro ao testar WhatsApp: ${error.message}`);
+            }
+        }
+
+        function editarItem(itemId) {
+            // Implementar edição de item
+            alert(`🔧 Funcionalidade de edição em desenvolvimento para o item ID: ${itemId}`);
+        }
+
+        function adicionarNovoItem() {
+            // Implementar adição de novo item
+            alert('🔧 Funcionalidade de adicionar novo item em desenvolvimento');
+        }
+
+        // Permitir adicionar gatilho com Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.id.startsWith('novoGatilho')) {
+                const itemId = e.target.id.replace('novoGatilho', '');
+                adicionarGatilho(parseInt(itemId));
+            }
+        });
+    </script>
+</body>
+</html>

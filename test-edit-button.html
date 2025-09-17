@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste do Botão Editar</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-item { background: rgba(255,255,255,0.1); padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .edit-btn { background: #3b82f6; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Teste do Sistema de Edição do Cardápio</h1>
+    
+    <div class="test-item">
+        <h3>Item de Teste: X-Bacon</h3>
+        <p>Preço: R$ 15.00</p>
+        <button class="edit-btn" onclick="testEditFunction()">✏️ Editar</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        function testEditFunction() {
+            console.log('Botão editar clicado!');
+            document.getElementById('result').innerHTML = '<p style="color: green;">✅ Botão editar funcionando!</p>';
+            
+            // Testar se o cardapioManager existe
+            if (typeof cardapioManager !== 'undefined') {
+                console.log('cardapioManager encontrado:', cardapioManager);
+                document.getElementById('result').innerHTML += '<p style="color: green;">✅ cardapioManager está disponível</p>';
+            } else {
+                console.log('cardapioManager não encontrado');
+                document.getElementById('result').innerHTML += '<p style="color: red;">❌ cardapioManager não está disponível</p>';
+            }
+        }
+        
+        // Verificar se estamos na página correta
+        console.log('Página de teste carregada');
+        console.log('URL atual:', window.location.href);
+    </script>
+</body>
+</html>
