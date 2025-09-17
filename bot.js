@@ -247,7 +247,7 @@ function executarAcaoGatilho(acao, msg, idAtual) {
         try {
           const idCheck = msg.from.replace('@c.us','');
           if (!carrinhos[idCheck]) { if (carrinhoService && typeof carrinhoService.initCarrinho === 'function') carrinhoService.initCarrinho(idCheck); }
-          const last = (carrinhos[idCheck] && carrinhos[idCheck].lastCardapioSent) || 0;
+          const last = (carrinhos[idCheck] && carrinhos[idCheck].la5stCardapioSent) || 0;
           const now = Date.now();
           const COOLDOWN = 3000; // ms
           if (now - last < COOLDOWN) {
@@ -1905,8 +1905,10 @@ if (events && typeof events.on === 'function') {
   });
 }
 
-// Inicia o servidor em porta 3001 se não houver variáveis de ambiente, mas só após o DB estar pronto
-const DASHBOARD_PORT = process.env.DASHBOARD_PORT || 3001;
+// Inicia o servidor em porta 3000 se não houver variáveis de ambiente, mas só após o DB estar pronto
+const DASHBOARD_PORT = process.env.DASHBOARD_PORT || 3000;
+// PORT é usado em alguns trechos (ex: fetch interno); mantenha compatibilidade com variável padrão
+const PORT = process.env.PORT || DASHBOARD_PORT;
 try {
   if (clientService && clientService.dbReady && typeof clientService.dbReady.then === 'function') {
     clientService.dbReady.then(async () => {
