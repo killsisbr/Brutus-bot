@@ -1905,8 +1905,8 @@ if (events && typeof events.on === 'function') {
   });
 }
 
-// Inicia o servidor em porta 3000 se não houver variáveis de ambiente, mas só após o DB estar pronto
-const DASHBOARD_PORT = process.env.DASHBOARD_PORT || 3000;
+// Inicia o servidor em porta 80 se não houver variáveis de ambiente, mas só após o DB estar pronto
+const DASHBOARD_PORT = process.env.DASHBOARD_PORT || 80;
 // PORT é usado em alguns trechos (ex: fetch interno); mantenha compatibilidade com variável padrão
 const PORT = process.env.PORT || DASHBOARD_PORT;
 try {

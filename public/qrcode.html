@@ -342,15 +342,55 @@
                         updateStatus('connecting', 'Gerando QR Code...');
                         qrcodeElement.className = 'qr-code loading';
                         qrcodeElement.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>Gerando QR Code...</p></div>';
+                        // Tentar forçar geração de novo QR Code se necessário
+                        setTimeout(() => {
+                            if (!data.status.connected && !data.status.hasQR) {
+                                restartWhatsApp();
+                            }
+                        }, 5000);
                     } else {
                         updateStatus('connecting', 'Conectando...');
                     }
                 } else {
-                    updateStatus('error', 'Erro na API');
+                    updateStatus('error', 'Erro na API - Verifique se o bot está rodando');
+                    qrcodeElement.className = 'qr-code loading';
+                    qrcodeElement.innerHTML = '<div style="text-align: center; padding: 40px; color: #ff6b6b;"><h3>⚠️ Erro de Conexão</h3><p>Verifique se o bot está rodando</p></div>';
                 }
             } catch (error) {
                 console.error('Erro ao verificar status:', error);
-                updateStatus('error', 'Erro na verificação');
+                updateStatus('error', 'Erro na verificação - Bot offline?');
+                qrcodeElement.className = 'qr-code loading';
+                qrcodeElement.innerHTML = '<div style="text-align: center; padding: 40px; color: #ff6b6b;"><h3>🔌 Bot Offline</h3><p>Verifique se o servidor está rodando</p></div>';
+            }
+        }
+        
+        // Função para reiniciar WhatsApp (gerar novo QR Code)
+        async function restartWhatsApp() {
+            try {
+                updateStatus('connecting', 'Reiniciando WhatsApp...');
+                qrcodeElement.className = 'qr-code loading';
+                qrcodeElement.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>Reiniciando conexão...</p></div>';
+                
+                const response = await fetch('/api/whatsapp/restart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.ok) {
+                    updateStatus('connecting', 'Aguardando novo QR Code...');
+                    // Aguardar um pouco antes de verificar novamente
+                    setTimeout(() => {
+                        checkConnectionStatus();
+                    }, 3000);
+                } else {
+                    updateStatus('error', 'Erro ao reiniciar');
+                }
+            } catch (error) {
+                console.error('Erro ao reiniciar WhatsApp:', error);
+                updateStatus('error', 'Erro ao reiniciar');
             }
         }
         
@@ -365,11 +405,24 @@
             refreshBtn.disabled = true;
             refreshIcon.className = 'spinning';
             
-            loadQRCode().finally(() => {
+            // Se não está conectado, tentar reiniciar
+            checkConnectionStatus().then(() => {
+                // Se ainda não tem QR Code após verificação, forçar restart
+                setTimeout(() => {
+                    fetch('/api/whatsapp/status')
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.ok && data.status && !data.status.connected && !data.status.hasQR) {
+                                restartWhatsApp();
+                            }
+                        })
+                        .catch(err => console.error('Erro na verificação:', err));
+                }, 1000);
+            }).finally(() => {
                 setTimeout(() => {
                     refreshBtn.disabled = false;
                     refreshIcon.className = '';
-                }, 1000);
+                }, 2000);
             });
         }
         
